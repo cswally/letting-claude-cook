@@ -25,10 +25,11 @@ import numpy as np
 
 
 def simulate(n_agents=1000, rounds=20000, f=0.1, chi=0.0, zeta=0.0,
-             seed=None, record_every=0):
+             seed=None, record_every=0, w0=None):
     """Run the simulation and return final wealth (and optional history).
 
-    Every agent starts with wealth 1, so the average wealth is always 1.
+    Every agent starts with wealth 1 (or `w0`, to continue an earlier run),
+    so the average wealth is always 1.
 
     Args:
         n_agents: number of agents (must be even).
@@ -38,11 +39,12 @@ def simulate(n_agents=1000, rounds=20000, f=0.1, chi=0.0, zeta=0.0,
         zeta: advantage dial (>= 0).
         seed: random seed for reproducibility.
         record_every: if > 0, also return a list of (round, gini) snapshots.
+        w0: optional starting wealth array (average must be 1).
     """
     if n_agents % 2:
         raise ValueError("n_agents must be even")
     rng = np.random.default_rng(seed)
-    w = np.ones(n_agents)
+    w = np.ones(n_agents) if w0 is None else np.array(w0, dtype=float)
     mean = 1.0
     dt = f ** 2
     history = []

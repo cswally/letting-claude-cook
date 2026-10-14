@@ -4,8 +4,8 @@ An agent-based model of how wealth spreads out (or piles up) when people trade,
 with two dials for policy and advantage. Course project roadmap:
 
 1. ~~Can AI get the basics right? Build the simulation from scratch and verify it~~
-2. **Add redistribution & advantage dials** ← this folder
-3. Turn the dials until the output matches real countries (WID data)
+2. ~~Add redistribution & advantage dials~~
+3. **Turn the dials until the output matches real countries (WID data)** ← in progress
 4. Compare the fitted dials with how those countries actually redistribute (OECD data)
 
 ## The model
@@ -68,7 +68,29 @@ chi = 0.5, zeta = 1.0, 1000 agents, 20000 rounds
 More redistribution (down the table) → more equal. More advantage (across) → less
 equal. For reference, real-world *wealth* Ginis are mostly between about 0.6 and 0.9.
 
+## Fitting the dials to a country (step 3)
+
+`fit.py` searches for the dial settings whose wealth shares best match a target
+(top 1%, top 10% and bottom 50% shares). It runs the simulation over a grid of
+settings, then a finer grid around the best one, about 1–2 minutes per target.
+
+```bash
+python fit.py data/wid_targets.csv --out data/fitted_dials.csv
+python fit.py --top1 0.35 --top10 0.70 --bottom50 0.02     # a single target
+```
+
+**Check that it works:** give it a distribution the model itself made with known
+dials, and see whether it finds them again. Hidden χ = 0.08, ζ = 0.20 →
+fitted χ = 0.085, ζ = 0.21.
+
+The model can produce top-10% shares from about 35% up to 80%+ and bottom-50%
+shares down to about 3.5%, which covers most real countries. It cannot produce
+*negative* wealth (debt), so countries where the bottom 50% hold ~0% or less
+will fit less well.
+
 ## Files
 
 - `wealth_sim.py` – the model and the inequality measures
 - `run.py` – command-line tool for turning the dials
+- `fit.py` – finds the dials that match a real country
+- `data/` – real-world data (see `data/README.md`)
